@@ -1,6 +1,7 @@
 /*
  * Changes to original ETag code by Ben Duggan (dugganbens@gmail.com)
- * Last change 5/3/2018
+ * Last change 5/12/2018
+ * Fixed initial antena sleep implimentation
  */
 
 /*
@@ -274,23 +275,24 @@ void loop() {  //This is the main function. It loops (repeats) forever.
         writeFlashLine();  //function to log to backup memory
       } // end ScanForTag
   
-    //The following gets executed when the above while loop times out
-    digitalWrite(SHD_PINA, HIGH);    //Turn off both RFID circuits
-    digitalWrite(SHD_PINB, HIGH);    //Turn off both RFID circuits
-    delay(pausetime);               //pause between polling attempts
-    /*
-    if (RFcircuit == 1) {           //switch between active RF circuits.
-      RFcircuit = 2;              // comment out the if statement to use just 1 RFID circuit
-    } else {
-      RFcircuit = 1;
-    } //end if
-    */
-    RFcircuit = 1;              //This line sets the active RF circuit to 1. comment out or delete to use both circuits. Uncomment if you just want to use the primary circuit.
+      //The following gets executed when the above while loop times out
+      digitalWrite(SHD_PINA, HIGH);    //Turn off both RFID circuits
+      digitalWrite(SHD_PINB, HIGH);    //Turn off both RFID circuits
+      delay(pausetime);               //pause between polling attempts
+      /*
+      if (RFcircuit == 1) {           //switch between active RF circuits.
+        RFcircuit = 2;              // comment out the if statement to use just 1 RFID circuit
+      } else {
+        RFcircuit = 1;
+      } //end if
+      */
+      RFcircuit = 1;              //This line sets the active RF circuit to 1. comment out or delete to use both circuits. Uncomment if you just want to use the primary circuit.
+    }
   }
   else {
     digitalWrite(SHD_PINA, HIGH);    //Turn off both RFID circuits
     digitalWrite(SHD_PINB, HIGH);    //Turn off both RFID circuits
-    delay(1000);
+    delay(10000); //Wait 10 seconds
   }
 }// end void loop
 
