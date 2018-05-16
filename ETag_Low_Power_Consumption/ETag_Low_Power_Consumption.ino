@@ -35,6 +35,8 @@ String readerID = "E40"; //The reader id; can be alphanumeric; add leading zeros
 const unsigned int polltime = 3000;       //How long in milliseconds to poll for tags
 const unsigned int pausetime = 500;       //How long in milliseconds to wait between polling intervals
 const unsigned int readFreq = 200;        //How long to wait after a tag is successfully read.
+const unsigned int antennaOnTime = 50; //How long the antenna stays on before turning off, in millis
+const unsigned int antennaOffTime = 50; //How long the antenna stays off before turning on, in millis
 byte slpH = 23;                            //When to go to sleep at night - hour
 byte slpM = 59;                            //When to go to sleep at night - minute
 byte slpS = 00; //When to go to sleep at night - seconds
@@ -272,13 +274,24 @@ void loop() {  //This is the main function. It loops (repeats) forever.
   stopMillis = currentMillis + polltime;   //next add the value of polltime to the current clock time to determine the desired stop time.
   while (stopMillis > millis()) {          //As long as the stoptime is less than the current millisecond counter, then keep looking for a tag
     //antennaOnTime
-    if (L.scanForTag(tagData) == true) {   //If a tag gets read, then do all the following stuff (if not it will keep trying until the timer runs out)
-      getTime();                           //Call a subroutine function that reads the time from the clock
-      displayTag();                        //Call a subroutine to display the tag data via serial USB
-      flashLED();
-      logSD();
-      writeFlashLine();  //function to log to backup memory
-    } // end ScanForTag
+    tempMillis = millis() + antennaOnTime;
+    Serial.println("scanning");
+    while(tempMillis >= millis()) {
+      digitalWrite(SHD_PINA, LOW);    //Turn off both RFID circuits
+      if (L.scanForTag(tagData) == true) {   //If a tag gets read, then do all the following stuff (if not it will keep trying until the timer runs out)
+        getTime();                           //Call a subroutine function that reads the time from the clock
+        displayTag();                        //Call a subroutine to display the tag data via serial USB
+        //flashLED();
+        logSD();
+        writeFlashLine();  //function to log to backup memory
+      } // end ScanForTag
+    }
+    tempMillis = millis() + antennaOffTime;
+    Serial.println("pausing");
+    while(tempMillis > millis()) {
+      digitalWrite(SHD_PINA, HIGH);    //Turn off both RFID circuits
+      digitalWrite(SHD_PINB, HIGH);    //Turn off both RFID circuits
+    }
   } //end while
 
   //The following gets executed when the above while loop times out
