@@ -31,17 +31,17 @@
 */
 
 //********************CONSTANTS (SET UP LOGGING PARAMETERS HERE!!)*******************************
-String readerID = "E40"; //The reader id; can be alphanumeric; add leading zeros if you want them
+String readerID = "sF"; //The reader id; can be alphanumeric; add leading zeros if you want them
 const unsigned int polltime = 3000;       //How long in milliseconds to poll for tags
 const unsigned int pausetime = 500;       //How long in milliseconds to wait between polling intervals
 const unsigned int readFreq = 200;        //How long to wait after a tag is successfully read.
 const unsigned int antennaOnTime = 50; //How long the antenna stays on before turning off, in millis
 const unsigned int antennaOffTime = 50; //How long the antenna stays off before turning on, in millis
-byte slpH = 23;                            //When to go to sleep at night - hour
-byte slpM = 59;                            //When to go to sleep at night - minute
+byte slpH = 19;                            //When to go to sleep at night - hour
+byte slpM = 00;                            //When to go to sleep at night - minute
 byte slpS = 00; //When to go to sleep at night - seconds
-byte wakH = 00;                            //When to wake up in the morning - hour             
-byte wakM = 01;                            //When to wake up in the morning - minute 
+byte wakH = 07;                            //When to wake up in the morning - hour             
+byte wakM = 00;                            //When to wake up in the morning - minute 
 byte wakS = 00; //Wen to wake up in the morning - minute
 
 //***********INITIALIZE INCLUDE FILES AND I/O PINS*******************
@@ -259,6 +259,8 @@ void setup() {  // This function sets everything up for logging.
 //******************************MAIN PROGRAM*******************************
 
 void loop() {  //This is the main function. It loops (repeats) forever.
+  saveLogSD("alive");
+
   if(awake()) {
     if (RFcircuit == 1) {             //Determin which RFID circuit to activate
       digitalWrite(SHD_PINA, LOW); //Turn on primary RFID circuit

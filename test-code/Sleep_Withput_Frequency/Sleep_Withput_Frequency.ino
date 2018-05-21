@@ -31,17 +31,17 @@
 */
 
 //********************CONSTANTS (SET UP LOGGING PARAMETERS HERE!!)*******************************
-String readerID = "E40"; //The reader id; can be alphanumeric; add leading zeros if you want them
+String readerID = "sNF"; //The reader id; can be alphanumeric; add leading zeros if you want them
 const unsigned int polltime = 3000;       //How long in milliseconds to poll for tags
 const unsigned int pausetime = 500;       //How long in milliseconds to wait between polling intervals
 const unsigned int readFreq = 200;        //How long to wait after a tag is successfully read.
 const unsigned int antennaOnTime = 50; //How long the antenna stays on before turning off, in millis
 const unsigned int antennaOffTime = 50; //How long the antenna stays off before turning on, in millis
-byte slpH = 23;                            //When to go to sleep at night - hour
-byte slpM = 59;                            //When to go to sleep at night - minute
+byte slpH = 19;                            //When to go to sleep at night - hour
+byte slpM = 00;                            //When to go to sleep at night - minute
 byte slpS = 00; //When to go to sleep at night - seconds
 byte wakH = 00;                            //When to wake up in the morning - hour             
-byte wakM = 01;                            //When to wake up in the morning - minute 
+byte wakM = 07;                            //When to wake up in the morning - minute 
 byte wakS = 00; //Wen to wake up in the morning - minute
 
 //***********INITIALIZE INCLUDE FILES AND I/O PINS*******************
@@ -259,6 +259,8 @@ void setup() {  // This function sets everything up for logging.
 //******************************MAIN PROGRAM*******************************
 
 void loop() {  //This is the main function. It loops (repeats) forever.
+  saveLogSD("alive");
+
   if(awake()) {
     if (RFcircuit == 1) {             //Determin which RFID circuit to activate
       digitalWrite(SHD_PINA, LOW); //Turn on primary RFID circuit
@@ -275,22 +277,12 @@ void loop() {  //This is the main function. It loops (repeats) forever.
     currentMillis = millis();                //To determine how long to poll for tags, first get the current value of the built in millisecond clock on the processor
     stopMillis = currentMillis + polltime;   //next add the value of polltime to the current clock time to determine the desired stop time.
     while (stopMillis > millis()) {          //As long as the stoptime is less than the current millisecond counter, then keep looking for a tag
-      //antennaOnTime
-      tempMillis = millis() + antennaOnTime;
-      while(tempMillis >= millis()) {
-        digitalWrite(SHD_PINA, LOW);    //Turn off both RFID circuits
-        if (L.scanForTag(tagData) == true) {   //If a tag gets read, then do all the following stuff (if not it will keep trying until the timer runs out)
-          getTime();                           //Call a subroutine function that reads the time from the clock
-          displayTag();                        //Call a subroutine to display the tag data via serial USB
-          flashLED();
-          logSD();
-          writeFlashLine();  //function to log to backup memory
-        } // end ScanForTag
-      }
-      tempMillis = millis() + antennaOffTime;
-      while(tempMillis > millis()) {
-        digitalWrite(SHD_PINA, HIGH);    //Turn off both RFID circuits
-        digitalWrite(SHD_PINB, HIGH);    //Turn off both RFID circuits
+      if (L.scanForTag(tagData) == true) {   //If a tag gets read, then do all the following stuff (if not it will keep trying until the timer runs out)
+        getTime();                           //Call a subroutine function that reads the time from the clock
+        displayTag();                        //Call a subroutine to display the tag data via serial USB
+        flashLED();
+        logSD();
+        writeFlashLine();  //function to log to backup memory
       }
     } //end while
   

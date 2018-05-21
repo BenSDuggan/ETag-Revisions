@@ -1,0 +1,9 @@
+Methods:
+Used same brand 12.0 V 4.5 Ah batteries with L7605CV GK17M power converter (output 5V) and running into boards USB port
+All boards had the time set to 05/01/18 07:00:00 and boards that turned on and off were set to turn on at 07:00:00 and off at 19:00:00.  Boards save “alive” to the log file ever 3050 ms (polltime + resttime).
+
+Sleep without antenna frequency: script with sleep method 
+Started: 5/16/2018 at 10:20 pm
+Ended: 
+Lasted: 2 days 18 hours or ~65 hours
+Should end in 3 days
