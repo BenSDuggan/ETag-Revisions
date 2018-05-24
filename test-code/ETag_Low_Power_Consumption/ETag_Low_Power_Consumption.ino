@@ -33,10 +33,10 @@
 //********************CONSTANTS (SET UP LOGGING PARAMETERS HERE!!)*******************************
 String readerID = "sF"; //The reader id; can be alphanumeric; add leading zeros if you want them
 const unsigned int polltime = 3000;       //How long in milliseconds to poll for tags
-const unsigned int pausetime = 500;       //How long in milliseconds to wait between polling intervals
+const unsigned int pausetime = 0;       //How long in milliseconds to wait between polling intervals
 const unsigned int readFreq = 200;        //How long to wait after a tag is successfully read.
-const unsigned int antennaOnTime = 50; //How long the antenna stays on before turning off, in millis
-const unsigned int antennaOffTime = 50; //How long the antenna stays off before turning on, in millis
+const unsigned int antennaOnTime = 100; //How long the antenna stays on before turning off, in millis
+const unsigned int antennaOffTime = 100; //How long the antenna stays off before turning on, in millis
 byte slpH = 19;                            //When to go to sleep at night - hour
 byte slpM = 00;                            //When to go to sleep at night - minute
 byte slpS = 00; //When to go to sleep at night - seconds
