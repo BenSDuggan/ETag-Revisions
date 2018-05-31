@@ -60,17 +60,17 @@ RTCZero rtc0;
 
 //********************CONSTANTS (SET UP LOGGING PARAMETERS HERE!!)*******************************
 String readerID = "E40"; //The reader id; can be alphanumeric; add leading zeros if you want them
-const unsigned int pollTime1 = 300;       //How long in milliseconds to poll for tags on circuit 1
+const unsigned int pollTime1 = 2000;       //How long in milliseconds to poll for tags on circuit 1
 const unsigned int pollTime2 = 1000;       //How long in milliseconds to poll for tags on circuit 2
 const unsigned int readInterval = 0;     //How often to try for repeated tag reads (milliseconds - should be at least 100, should not exceed pollTime)
-const unsigned int pauseTime = 100;        //How long in milliseconds to wait between polling intervals
+const unsigned int pauseTime = 1000;        //How long in milliseconds to wait between polling intervals
 const unsigned int readFreq = 200;         //How long to wait after a tag is successfully read.
 byte slpH = 23;                            //When to go to sleep at night - hour
 byte slpM = 59;                            //When to go to sleep at night - minute
-byte slpS = 00; //When to go to sleep at night - seconds
+byte slpS = 30; //When to go to sleep at night - seconds
 byte wakH = 00;                            //When to wake up in the morning - hour             
-byte wakM = 03;                            //When to wake up in the morning - minute 
-byte wakS = 00; //Wen to wake up in the morning - minute
+byte wakM = 00;                            //When to wake up in the morning - minute 
+byte wakS = 30; //Wen to wake up in the morning - minute
 //***********************************************************************************************
 
 //************************* initialize variables & methods ******************************
@@ -517,6 +517,13 @@ bool awake() {
      if(sleep) {
        saveLogSD("SCANNING STARTED");
        sleep = false;
+       // Flash the LED 5 times
+      for(int i=0; i<5; i++) {
+        digitalWrite(LED_RFID, LOW);
+        delay(100);
+        digitalWrite(LED_RFID, HIGH);
+        delay(100);
+      }
      }
      return true;
    }
@@ -531,6 +538,13 @@ bool awake() {
      if(!sleep) {
        saveLogSD("SCANNING STOPPED");
        sleep = true;
+       // Flash the LED 5 times
+      for(int i=0; i<5; i++) {
+        digitalWrite(LED_RFID, LOW);
+        delay(100);
+        digitalWrite(LED_RFID, HIGH);
+        delay(100);
+      }
      }
      return false;
    }
@@ -549,17 +563,18 @@ void goToSleep() {
   digitalWrite(SHD_PINA, HIGH); //Turn off primary RFID circuit
   // Flash the LED 5 times
   for(int i=0; i<5; i++) {
-    digitalWrite(LED_RFID, HIGH);
-    delay(100);
     digitalWrite(LED_RFID, LOW);
+    delay(100);
+    digitalWrite(LED_RFID, HIGH);
     delay(100);
   }
-  delay(118000); //Wait 120 seconds and then sleep
+  //delay(118000); //Wait 120 seconds and then sleep
+  delay(2000);
   // Flash the LED 5 times
   for(int i=0; i<5; i++) {
-    digitalWrite(LED_RFID, HIGH);
-    delay(100);
     digitalWrite(LED_RFID, LOW);
+    delay(100);
+    digitalWrite(LED_RFID, HIGH);
     delay(100);
   }
   serial.println("Going to sleep now");
@@ -567,14 +582,7 @@ void goToSleep() {
 }
 
 void wakeUp() {
-  serial.println("Waking up now"); //This won't be displayed
-  // Flash the LED 5 times
-  for(int i=0; i<5; i++) {
-    digitalWrite(LED_RFID, HIGH);
-    delay(100);
-    digitalWrite(LED_RFID, LOW);
-    delay(100);
-  }
+  //serial.println("Waking up now"); //This won't be displayed
 }
 /*
 void getTime() {  //Read in the time from the clock registers
