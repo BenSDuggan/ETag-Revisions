@@ -67,10 +67,10 @@ const unsigned int pauseTime = 100;        //How long in milliseconds to wait be
 const unsigned int readFreq = 200;         //How long to wait after a tag is successfully read.
 /*** START - Normal Sleep Schedule ***/
 byte slpH = 23; //When to go to sleep at night - hour
-byte slpM = 00; //When to go to sleep at night - minute
+byte slpM = 59; //When to go to sleep at night - minute
 byte slpS = 00; //When to go to sleep at night - seconds
 byte wakH = 00; //When to wake up in the morning - hour
-byte wakM = 10; //When to wake up in the morning - minute
+byte wakM = 1; //When to wake up in the morning - minute
 byte wakS = 00; //Wen to wake up in the morning - minute
 /*** END - Normal Sleep Schedule ***/
 /*** START - Delayed Sleep ***/
@@ -79,9 +79,9 @@ bool delayByTime = true; //If you want to delay the start of the unit by number 
 //byte delayYear = 00; //Years from 0-.  When delayByTime=true:This is the number of years till start.  When delayByStartDate=true:This is the start year
 //byte delayMonth = 00; //Month.  When delayByTime=true:This is the number of years till start.  When delayByStartDate=true:This is the start year
 //byte delayDay = 00; //Years in 2 decimal form.  When delayByTime=true:This is the number of years till start.  When delayByStartDate=true:This is the start year
-byte delayHour = 2; //Years in 2 decimal form.  When delayByTime=true:This is the number of years till start.  When delayByStartDate=true:This is the start year
-byte delayMinute = 00; //Years in 2 decimal form.  When delayByTime=true:This is the number of years till start.  When delayByStartDate=true:This is the start year
-byte delaySecond = 00; //Years in 2 decimal form.  When delayByTime=true:This is the number of years till start.  When delayByStartDate=true:This is the start year
+//byte delayHour = 00; //Years in 2 decimal form.  When delayByTime=true:This is the number of years till start.  When delayByStartDate=true:This is the start year
+//byte delayMinute = 01; //Years in 2 decimal form.  When delayByTime=true:This is the number of years till start.  When delayByStartDate=true:This is the start year
+//byte delaySecond = 00; //Years in 2 decimal form.  When delayByTime=true:This is the number of years till start.  When delayByStartDate=true:This is the start year
 /*** END - Delayed Sleep ***/
 //***********************************************************************************************
 
@@ -303,9 +303,11 @@ void loop() {  //This is the main function. It loops (repeats) forever.
     saveLogSD("DELAY STARTED");
     delayByTime = false;
 
+/*
     rtc0.setAlarmTime((rtc0.getHours()+delayHour)+((rtc0.getMinutes()+delayMinute)+((rtc0.getSeconds()+delaySecond)/60))/60, ((rtc0.getMinutes()+delayMinute)+((rtc0.getSeconds()+delaySecond)/60))%60, (rtc0.getSeconds()+delaySecond)%60);
     rtc0.enableAlarm(rtc0.MATCH_HHMMSS);
     rtc0.attachInterrupt(wakeFromDelay);
+    */
 
     goToSleep();
   }
@@ -601,6 +603,7 @@ void goToSleep() {
 
 void wakeUp() {
   //serial.println("Waking up now"); //This won't be displayed
+  saveLogSD("SCANNING STARTED");
 }
 
 void wakeFromDelay() {
