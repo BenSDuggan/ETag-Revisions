@@ -65,12 +65,11 @@ const unsigned int pollTime2 = 1000;       //How long in milliseconds to poll fo
 const unsigned int readInterval = 0;     //How often to try for repeated tag reads (milliseconds - should be at least 100, should not exceed pollTime)
 const unsigned int pauseTime = 100;        //How long in milliseconds to wait between polling intervals
 const unsigned int readFreq = 200;         //How long to wait after a tag is successfully read.
-byte slpH = 19;                            //When to go to sleep at night - hour
-byte slpM = 00;                            //When to go to sleep at night - minute
-byte slpS = 00; //When to go to sleep at night - seconds
-byte wakH = 07;                            //When to wake up in the morning - hour             
+byte slpH = 23;                            //When to go to sleep at night - hour
+byte slpM = 55;                            //When to go to sleep at night - minute
+byte wakH = 00;                            //When to wake up in the morning - hour             
 byte wakM = 00;                            //When to wake up in the morning - minute 
-byte wakS = 00; //Wen to wake up in the morning - minute
+byte wakS = 30; //Wen to wake up in the morning - minute
 //***********************************************************************************************
 
 //************************* initialize variables & methods ******************************
@@ -104,7 +103,6 @@ unsigned int mDelay = 0;
 unsigned int mDelay2 = 0;
 volatile bool SLEEP_FLAG;
 String ss0, mm0, hh0, da0, mo0; //Store time with zero in front
-bool sleep = false; //If the board experienced a sleep change of state, hold it here
 String getTime();
 byte readFlashByte(unsigned long fAddress);
 void writeFlashByte(unsigned long fAddress, byte fByte);
@@ -275,9 +273,32 @@ void setup() {  // This function sets everything up for logging.
   RFcircuit = 1;  //Indicates that the reader should start with the primary RFID circuit
 //  RFcircuit = 2;  //Indicates that the reader should start with the secondary RFID circuit  
 
-  if(awake()) {
-    serial.println("Scanning for tags...\n");   //message to user
-    saveLogSD("SCANNING STARTED");
+  // Initial check to see if board should start sleeping or scanning 
+  DateTime now = rtc.now();
+  int tSleep = slpM*60 + slpH*3600;
+  int tWake = wakS + wakM*60 + wakH*3600;
+  int tRTC = now.second() + now.minute()*60 + now.hour()*3600; //Get the time from RTC as seconds
+  if(tSleep < tWake) {
+    if(tSleep <= tRTC && tRTC < tWake) {
+      // sleeping
+      goToSleep();
+    }
+    else {
+      // awake
+      serial.println("Scanning for tags...\n");   //message to user
+      saveLogSD("SCANNING STARTED");
+    }
+  }
+  else {
+    if(tWake <= tRTC && tRTC < tSleep) {
+      // awake
+      serial.println("Scanning for tags...\n");   //message to user
+      saveLogSD("SCANNING STARTED");
+    }
+    else {
+      // sleeping
+      goToSleep();
+    }
   }
 } // end setup
 
@@ -300,17 +321,16 @@ void loop() {  //This is the main function. It loops (repeats) forever.
       while (stopMillis > millis()) {          //As long as the stoptime is less than the current millisecond counter, then keep looking for a tag
           gManDecoder1.EnableMonitoring();
           delay(readInterval);
-          if(gManDecoder1.DecodeAvailableData(&xd) > 0)
-          {   
-          //serial.print("RFID 2 Tag Detected: "); //Print a message stating that a tag was found 
-          getTime();                           //Call a subroutine function that reads the time from the clock
-          displayTag(&xd);                        //Call a subroutine to display the tag data via serial USB
-          flashLED();
-          logRFID_To_SD(&xd);
-          writeRFID_To_FlashLine(&xd);  //function to log to backup memory
-          //match = checkTag();
-          //serial.print("Match?: ");
-          //serial.println(match, DEC);
+          if(gManDecoder1.DecodeAvailableData(&xd) > 0) {   
+            //serial.print("RFID 2 Tag Detected: "); //Print a message stating that a tag was found 
+            getTime();                           //Call a subroutine function that reads the time from the clock
+            displayTag(&xd);                        //Call a subroutine to display the tag data via serial USB
+            flashLED();
+            logRFID_To_SD(&xd);
+            writeRFID_To_FlashLine(&xd);  //function to log to backup memory
+            //match = checkTag();
+            //serial.print("Match?: ");
+            //serial.println(match, DEC);
           } // end ScanForTag
       }
       gManDecoder1.DisableMonitoring();
@@ -508,62 +528,15 @@ String getTime() {  //Read in the time from the clock registers
 }
 
 bool awake() {
-   DateTime now = rtc.now();
-   int tSleep = slpS + slpM*60 + slpH*3600;
-   int tWake = wakS + wakM*60 + wakH*3600;
-   int tRTC = now.second() + now.minute()*60 + now.hour()*3600; //Get the time from RTC as seconds
- 
-   if(tWake <= tRTC && tRTC < tSleep) { 
-     if(sleep) {
-       saveLogSD("SCANNING STARTED");
-       sleep = false;
-       // Flash the LED 5 times
-      for(int i=0; i<5; i++) {
-        digitalWrite(LED_RFID, LOW);
-        delay(100);
-        digitalWrite(LED_RFID, HIGH);
-        delay(100);
-      }
-     }
-     return true;
+  DateTime now = rtc.now();
+   if(slpH == now.hour() && slpM == now.minute()) {
+    return false;
    }
-   else if(tWake > tRTC) {
-     if(!sleep) {
-       saveLogSD("SCANNING STOPPED");
-       sleep = true;
-     }
-     return false;
-   }
-   else if(tRTC >= tSleep) {
-     if(!sleep) {
-       saveLogSD("SCANNING STOPPED");
-       sleep = true;
-       // Flash the LED 5 times
-      for(int i=0; i<5; i++) {
-        digitalWrite(LED_RFID, LOW);
-        delay(100);
-        digitalWrite(LED_RFID, HIGH);
-        delay(100);
-      }
-     }
-     return false;
-   }
-   else {
-     if(sleep) {
-       saveLogSD("SCANNING STARTED");
-       sleep = false;
-       for(int i=0; i<5; i++) {
-        digitalWrite(LED_RFID, LOW);
-        delay(100);
-        digitalWrite(LED_RFID, HIGH);
-        delay(100);
-      }
-     }
-     return true;
-   }
+   return true;
 }
 
 void goToSleep() {
+  saveLogSD("SCANNING STOPPED");
   serial.println("Going to sleep in 120 seconds...");
   digitalWrite(SHD_PINB, HIGH); //Turn on secondary RFID circuit
   digitalWrite(SHD_PINA, HIGH); //Turn off primary RFID circuit
@@ -588,6 +561,7 @@ void goToSleep() {
 
 void wakeUp() {
   //serial.println("Waking up now"); //This won't be displayed
+  saveLogSD("SCANNING STARTED");
 }
 /*
 void getTime() {  //Read in the time from the clock registers
