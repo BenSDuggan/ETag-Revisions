@@ -7,6 +7,7 @@ Revisions by [Ben Duggan](https://github.com/BenSDuggan).  You can email with qu
 * [Original code with instillation help](https://github.com/Eli-S-Bridge/ETAG_4095_Apr2018)
 
 ## List of changes:
+* specialty-code: This is a folder that contains special versions of BSD_ETag_Revisions.  Look further in the readme to see a description of the contents.
 * Sleep function: To save battery life the board can go to sleep.  In the constants and logging parameters section slpH and slpM are hour and minute (seconds are not supported) to put the board to sleep, respectively.  wakH, wakM and wakS are the hour, minute and second to wake up, respectively.  Both of these are in 24-hour format.  Some notes on this feature:
     * The sleep function works for almost any time.  To be clear, the sleep function won't work if the main loop() takes longer than 1 minute.  So as a rule of thumb, (pollTime1 + pollTime2 + readInterval + pauseTime) <= 55 seconds.  Additionally, the sleep time and wake time should differ by more than 3 minutes.  ~~This feature only works for sleeping at night and waking up in the morning.  By this I mean that the following must hold: 0 <= wakH:wakM:wakS <= slpH:slpM:slpS <= 23:59:59~~
     * When the board goes to sleep the communication through the USB is terminated.  So, if the board is scheduled to sleep and you try to upload code it won't work.  To fix this the board will terminate scanning and write to the log file when the board is scheduled to sleep, but the board won't go into its deep sleep for 2 minutes after a sleep is scheduled.
@@ -15,3 +16,6 @@ Revisions by [Ben Duggan](https://github.com/BenSDuggan).  You can email with qu
 * Log file: There is a log file added to the board.  This is like the one from the Gen. 2.  The file saves when logging is started and stopped.
 * Create data and log file at initial startup:  The data and log files are created immediately when the board is turned on, even if nothing is in them.
 * Change file name to readerID + data/log: The file name scheme changed from just one that says datalog.txt to (readerID + "data.txt") for the data file and (readerID + "log.txt") for the log file.
+
+## specialty-code:
+* USB_Batterypack_Sleep: This code is designed to work with USB battery packs that turn off power with the normal sleep method.  This version adds pollTimeSleep and pauseTimeSleep variables.  When the board is sleeping it turns the antenna on for pollTimeSleep ms and then off for pauseTimeSleep ms.  You will need to calibrate this with your battery pack.  For best results pollTimeSleep should be minimized wile pauseTimeSleep should be maximized.  There is a risk that the board will not wake up again.
