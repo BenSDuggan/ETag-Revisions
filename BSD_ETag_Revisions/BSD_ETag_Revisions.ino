@@ -1,7 +1,7 @@
 /*
  * Changes to original ETag code by Ben Duggan (dugganbens@gmail.com) (https://github.com/BenSDuggan/)
- * Last change 5/28/2018
- * Added blinking to LED when sleeping and waking up; changed plural to singular
+ * Last change 6/12/2018
+ * Added logging to help determin when the board dies
  */
 
 /*
@@ -357,8 +357,8 @@ void loop() {  //This is the main function. It loops (repeats) forever.
       }
       gManDecoder2.DisableMonitoring();
     }
-    digitalWrite(SHD_PINB, HIGH); //Turn on secondary RFID circuit
-    digitalWrite(SHD_PINA, HIGH); //Turn off primary RFID circuit
+    //digitalWrite(SHD_PINB, HIGH); //Turn on secondary RFID circuit
+    //digitalWrite(SHD_PINA, HIGH); //Turn off primary RFID circuit
     delay(pauseTime);               //pause between polling attempts
     if (RFcircuit == 1) {            //switch between active RF circuits.
       RFcircuit = 2;                 // comment out the if statement to use just 1 RFID circuit
@@ -371,7 +371,7 @@ void loop() {  //This is the main function. It loops (repeats) forever.
   else {
     goToSleep();
   }
-  
+  saveLogSD("BOARD STILL ON"); //Save to the SD card log that the board is still on
 }// end void loop
 
 

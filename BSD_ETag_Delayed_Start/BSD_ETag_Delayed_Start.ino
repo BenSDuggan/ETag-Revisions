@@ -1,7 +1,7 @@
 /*
    Changes to original ETag code by Ben Duggan (dugganbens@gmail.com) (https://github.com/BenSDuggan/)
-   Last change 6/1/2018
-   Added blinking to LED when sleeping and waking up; changed plural to singular
+   Last change 6/12/2018
+ * Added logging to help determin when the board dies
 */
 
 /*
@@ -379,7 +379,7 @@ void loop() {  //This is the main function. It loops (repeats) forever.
   else {
     goToSleep();
   }
-
+  saveLogSD("BOARD STILL ON"); //Save to the SD card log that the board is still on
 }// end void loop
 
 

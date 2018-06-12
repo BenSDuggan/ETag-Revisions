@@ -1,7 +1,7 @@
 /*
  * Changes to BSD_ETag_Revisions code by Ben Duggan (dugganbens@gmail.com) (https://github.com/BenSDuggan/)
- * Last change 6/9/2018
- * Added USB sleep functionality
+ * Last change 6/12/2018
+ * Added logging to help determin when the board dies
  */
 
 /*
@@ -370,7 +370,7 @@ void loop() {  //This is the main function. It loops (repeats) forever.
   else {
     // No need to do anything
   }
-  
+  saveLogSD("BOARD STILL ON"); //Save to the SD card log that the board is still on
 }// end void loop
 
 

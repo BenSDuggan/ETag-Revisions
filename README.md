@@ -7,6 +7,7 @@ Revisions by [Ben Duggan](https://github.com/BenSDuggan).  You can email with qu
 * [Original code with instillation help](https://github.com/Eli-S-Bridge/ETAG_4095_Apr2018)
 
 ## List of changes:
+* battery logging: To help determin the time that the board dies, every time the main loop is executed a log is saved that says "BOARD STILL ON".  This only works when the main loop is being executed.  This means that the log won't save when the board is sleeping.
 * specialty-code: This is a folder that contains special versions of BSD_ETag_Revisions.  Look further in the readme to see a description of the contents.
 * Sleep function: To save battery life the board can go to sleep.  In the constants and logging parameters section slpH and slpM are hour and minute (seconds are not supported) to put the board to sleep, respectively.  wakH, wakM and wakS are the hour, minute and second to wake up, respectively.  Both of these are in 24-hour format.  Some notes on this feature:
     * The sleep function works for almost any time.  To be clear, the sleep function won't work if the main loop() takes longer than 1 minute.  So as a rule of thumb, (pollTime1 + pollTime2 + readInterval + pauseTime) <= 55 seconds.  Additionally, the sleep time and wake time should differ by more than 3 minutes.  ~~This feature only works for sleeping at night and waking up in the morning.  By this I mean that the following must hold: 0 <= wakH:wakM:wakS <= slpH:slpM:slpS <= 23:59:59~~
