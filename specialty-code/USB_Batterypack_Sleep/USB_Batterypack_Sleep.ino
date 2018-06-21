@@ -1,7 +1,7 @@
 /*
  * Changes to BSD_ETag_Revisions code by Ben Duggan (dugganbens@gmail.com) (https://github.com/BenSDuggan/)
- * Last change 6/12/2018
- * Added logging to help determin when the board dies
+ * Last change 6/20/2018
+ * Making board wake up at correct time
  */
 
 /*
@@ -65,10 +65,10 @@ const unsigned int pauseTime = 100;        //How long in milliseconds to wait be
 const unsigned int readFreq = 200;         //How long to wait after a tag is successfully read.
 const unsigned int pollTimeSleep = 300; //This is the time the antenna will be kept on duing sleep, in milliseconds
 const unsigned int pauseTimeSleep = 10000; //This is the time the antenna will be kept off during sleep, in milliseconds
-byte slpH = 15;                            //When to go to sleep at night - hour
-byte slpM = 20;                            //When to go to sleep at night - minute
-byte wakH = 15;                            //When to wake up in the morning - hour             
-byte wakM = 22;                            //When to wake up in the morning - minute 
+byte slpH = 19;                            //When to go to sleep at night - hour
+byte slpM = 15;                            //When to go to sleep at night - minute
+byte wakH = 19;                            //When to wake up in the morning - hour             
+byte wakM = 20;                            //When to wake up in the morning - minute 
 byte wakS = 0; //Wen to wake up in the morning - minute
 //***********************************************************************************************
 
@@ -541,9 +541,9 @@ bool awake() {
       serial.println("Sleeping...");
       // Keep board at enough power for battery pack to stay on
       digitalWrite(SHD_PINA, LOW); //Turn on primary RFID circuit
-      delay(pollTimeSleep);
+      delay(min(pollTimeSleep, (tWake-tRTC)*1000));
       digitalWrite(SHD_PINA, HIGH); //Turn off primary RFID circuit
-      delay(pauseTimeSleep);
+      delay(min(pauseTimeSleep, (tWake-(tRTC+pollTimeSleep/1000))*1000));
       return false;
     }
     else {
@@ -575,9 +575,9 @@ bool awake() {
       serial.println("Sleeping...");
       // Keep board at enough power for battery pack to stay on
       digitalWrite(SHD_PINA, LOW); //Turn on primary RFID circuit
-      delay(pollTimeSleep);
+      delay(min(pollTimeSleep, (tWake-tRTC)*1000));
       digitalWrite(SHD_PINA, HIGH); //Turn off primary RFID circuit
-      delay(pauseTimeSleep);
+      delay(min(pauseTimeSleep, (tWake-(tRTC+pollTimeSleep/1000))*1000));
       return false;
     }
   }
