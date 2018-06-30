@@ -104,6 +104,7 @@ unsigned int mDelay2 = 0;
 volatile bool SLEEP_FLAG;
 bool sleeping = false;
 String ss0, mm0, hh0, da0, mo0; //Store time with zero in front
+bool savedBoardStatus = true; //Flag that saves if the "BOARD STILL ON" message was saved recently
 String getTime();
 byte readFlashByte(unsigned long fAddress);
 void writeFlashByte(unsigned long fAddress, byte fByte);
@@ -370,7 +371,17 @@ void loop() {  //This is the main function. It loops (repeats) forever.
   else {
     // No need to do anything
   }
-  saveLogSD("BOARD STILL ON"); //Save to the SD card log that the board is still on
+  // Check to see if a log should be saved (meaning that it's 00, 10, 20, 30, 40 or 50 minutes)
+  if(rtc.now().hour()%10 == 0) {
+    // Check to see if a log was saved this minute, if one wasn't then save a log
+    if(savedBoardStatus) {
+      saveLogSD("BOARD STILL ON"); //Save to the SD card log that the board is still on
+      savedBoardStatus = false;
+    }
+  }
+  else {
+    savedBoardStatus = true; //Reset savedBoardStatus flag
+  }
 }// end void loop
 
 
